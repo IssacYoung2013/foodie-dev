@@ -61,7 +61,16 @@ public class IndexController {
         if (rootCatId == null) {
             return JSONResult.errorMsg("分类不存在");
         }
-
         return JSONResult.ok(categoryService.getSubCatList(rootCatId));
+    }
+
+    @GetMapping("/sixNewItems/{rootCatId}")
+    @ApiOperation(value = "查询一级分类下的最新6条商品数据", notes = "查询一级分类下的最新6条商品数据", httpMethod = "GET")
+    @ApiParam(name = "rootCatId", value = "一级分类id", required = true)
+    public JSONResult sixNewItems(@PathVariable Integer rootCatId) {
+        if (rootCatId == null) {
+            return JSONResult.errorMsg("分类不存在");
+        }
+        return JSONResult.ok(categoryService.getSixNewItemsLazy(rootCatId));
     }
 }

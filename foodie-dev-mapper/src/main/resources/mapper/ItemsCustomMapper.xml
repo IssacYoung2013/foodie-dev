@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.issac.mapper.ItemsCustomMapperMapper">
+
+    <select id="queryItemComments" parameterType="map" resultMap="">
+        SELECT u.nickname,u.face userFace, ic.comment_level AS commentLevel, ic.content,ic.sepc_name AS
+        specName,ic.created_time AS createdTime
+        FROM items_comments ic
+        LEFT JOIN users u ON ic.user_id = u.id
+        WHERE ic.item_id = #{map.itemId}
+        <if test="">
+            AND ic.comment_level = 1
+        </if>
+    </select>
+
+</mapper>
