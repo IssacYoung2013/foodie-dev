@@ -1,16 +1,69 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.issac.mapper.ItemsCustomMapperMapper">
+<mapper namespace="com.issac.mapper.ItemsCustomMapper">
 
-    <select id="queryItemComments" parameterType="map" resultMap="">
+    <select id="queryItemComments" parameterType="Map" resultType="com.issac.pojo.vo.ItemCommentVO">
         SELECT u.nickname,u.face userFace, ic.comment_level AS commentLevel, ic.content,ic.sepc_name AS
         specName,ic.created_time AS createdTime
         FROM items_comments ic
         LEFT JOIN users u ON ic.user_id = u.id
         WHERE ic.item_id = #{map.itemId}
-        <if test="">
-            AND ic.comment_level = 1
+        <if test="map.level != null and map.level != ''">
+            AND ic.comment_level = #{map.level}
         </if>
+    </select>
+
+    <!--    k:默认，c:销量，p:价格-->
+    <select id="searchItems" parameterType="Map" resultType="com.issac.pojo.vo.SearchItemsVO">
+        SELECT i.id AS itemId,i.item_name AS itemName, i.sell_counts AS sellCounts,
+        ii.url AS imgUrl, tempSpec.price_discount AS price
+        FROM items i
+        LEFT JOIN items_img ii
+        ON i.id = ii.item_id
+        AND ii.is_main = 1
+        LEFT JOIN (SELECT item_id,MIN(price_discount) AS price_discount FROM items_spec GROUP BY item_id) tempSpec
+        ON i.id = tempSpec.item_id
+        WHERE 1 = 1
+        <if test="map.keywords != null and map.keywords != ''">
+            AND i.item_name like '%${map.keywords}%'
+        </if>
+        order by
+        <choose>
+            <when test="map.sort == &quot;c&quot;">
+                i.sell_counts desc
+            </when>
+            <when test="map.sort == &quot;p&quot;">
+                tempSpec.price_discount desc
+            </when>
+            <otherwise>
+                i.item_name asc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="searchItemsByThirdCatId" parameterType="Map" resultType="com.issac.pojo.vo.SearchItemsVO">
+        SELECT i.id AS itemId,i.item_name AS itemName, i.sell_counts AS sellCounts,
+        ii.url AS imgUrl, tempSpec.price_discount AS price
+        FROM items i
+        LEFT JOIN items_img ii
+        ON i.id = ii.item_id
+        AND ii.is_main = 1
+        LEFT JOIN (SELECT item_id,MIN(price_discount) AS price_discount FROM items_spec GROUP BY item_id) tempSpec
+        ON i.id = tempSpec.item_id
+        WHERE 1 = 1
+        and i.cat_id = #{map.catId}
+        order by
+        <choose>
+            <when test="map.sort == &quot;c&quot;">
+                i.sell_counts desc
+            </when>
+            <when test="map.sort == &quot;p&quot;">
+                tempSpec.price_discount desc
+            </when>
+            <otherwise>
+                i.item_name asc
+            </otherwise>
+        </choose>
     </select>
 
 </mapper>

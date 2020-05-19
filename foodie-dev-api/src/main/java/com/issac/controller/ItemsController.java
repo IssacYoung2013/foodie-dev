@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("items")
 @Api(value = "商品详情", tags = {"商品详情相关接口"})
-public class ItemsController {
+public class ItemsController extends BaseController {
 
     public static final Logger log = LoggerFactory.getLogger(ItemsController.class);
 
@@ -60,5 +60,35 @@ public class ItemsController {
             return JSONResult.errorMsg("null");
         }
         return JSONResult.ok(itemService.queryCommentCounts(itemId));
+    }
+
+    @GetMapping("/comments")
+    @ApiOperation(value = "查询商品评论", notes = "查询商品评论", httpMethod = "GET")
+    public JSONResult comments(@RequestParam String itemId,
+                               @RequestParam(value = "level", required = false) Integer level,
+                               @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
+        if (StringUtils.isBlank(itemId)) {
+            return JSONResult.errorMsg("null");
+        }
+        return JSONResult.ok(itemService.queryPagedComments(itemId, level, page, pageSize));
+    }
+
+    @GetMapping("/search")
+    @ApiOperation(value = "搜索商品列表", notes = "搜索商品列表", httpMethod = "GET")
+    public JSONResult search(@RequestParam String keywords,
+                             @RequestParam(value = "sort", required = false) String sort,
+                             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                             @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+        return JSONResult.ok(itemService.searchItems(keywords, sort, page, pageSize));
+    }
+
+    @GetMapping("/catItems")
+    @ApiOperation(value = "搜索商品分类列表", notes = "搜索商品分类列表", httpMethod = "GET")
+    public JSONResult catItems(@RequestParam Integer catId,
+                               @RequestParam(value = "sort", required = false) String sort,
+                               @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+        return JSONResult.ok(itemService.searchItemsByThirdCatId(catId, sort, page, pageSize));
     }
 }

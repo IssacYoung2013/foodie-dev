@@ -1,17 +1,24 @@
 package com.issac.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.issac.enums.CommentLevel;
 import com.issac.mapper.*;
 import com.issac.pojo.*;
 import com.issac.pojo.vo.CommentLevelCountsVO;
+import com.issac.pojo.vo.ItemCommentVO;
+import com.issac.pojo.vo.SearchItemsVO;
 import com.issac.service.ItemService;
+import com.issac.util.PagedGridResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: ywy
@@ -35,6 +42,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Resource
     ItemsCommentsMapper itemsCommentsMapper;
+
+    @Resource
+    ItemsCustomMapper itemsCustomMapper;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -92,5 +102,52 @@ public class ItemServiceImpl implements ItemService {
             condition.setCommentLevel(level);
         }
         return itemsCommentsMapper.selectCount(condition);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public PagedGridResult queryPagedComments(String itemId, Integer level, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("itemId", itemId);
+        map.put("level", level);
+
+        // mybatis-pagehelper
+        PageHelper.startPage(page, pageSize);
+        List<ItemCommentVO> itemComments = itemsCustomMapper.queryItemComments(map);
+        return setterPagedGrid(itemComments, page);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("keywords", keywords);
+        map.put("sort", sort);
+
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> items = itemsCustomMapper.searchItems(map);
+        return setterPagedGrid(items, page);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public PagedGridResult searchItemsByThirdCatId(Integer catId, String sort, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("catId", catId);
+        map.put("sort", sort);
+
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> items = itemsCustomMapper.searchItemsByThirdCatId(map);
+        return setterPagedGrid(items, page);
+    }
+
+    private PagedGridResult setterPagedGrid(List<?> list, Integer page) {
+        PageInfo<?> pageInfo = new PageInfo<>(list);
+        PagedGridResult gridResult = new PagedGridResult();
+        gridResult.setPage(page);
+        gridResult.setRows(list);
+        gridResult.setTotal(pageInfo.getPages());
+        gridResult.setRecords(pageInfo.getTotal());
+        return gridResult;
     }
 }
