@@ -6,6 +6,7 @@ import com.issac.pojo.ItemsParam;
 import com.issac.pojo.ItemsSpec;
 import com.issac.pojo.vo.CommentLevelCountsVO;
 import com.issac.pojo.vo.ItemCommentVO;
+import com.issac.pojo.vo.ShopCartItemVO;
 import com.issac.util.PagedGridResult;
 
 import java.util.List;
@@ -85,5 +86,33 @@ public interface ItemService {
      * @return
      */
     PagedGridResult searchItemsByThirdCatId(Integer catId, String sort, Integer page, Integer pageSize);
+
+    /**
+     * 刷新渲染购物车的商品数据
+     * @param specIds
+     * @return
+     */
+    List<ShopCartItemVO> queryItemsBySpecIds(String specIds);
+
+    /**
+     * 根据规格id查询商品规格
+     * @param specId
+     * @return
+     */
+    ItemsSpec queryItemSpecById(String specId);
+
+    /**
+     * 根据商品id获取商品主图url
+     * @param itemId
+     * @return
+     */
+    String queryItemsMainImgById(String itemId);
+
+    /**
+     * 扣除商品规格库存
+     * @param buyCounts
+     * @param specId
+     */
+    void decreaseItemSpecStock(String specId, Integer buyCounts);
 
 }

@@ -9,6 +9,7 @@ import com.issac.service.ItemService;
 import com.issac.util.JSONResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,5 +91,15 @@ public class ItemsController extends BaseController {
                                @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
         return JSONResult.ok(itemService.searchItemsByThirdCatId(catId, sort, page, pageSize));
+    }
+
+    @GetMapping("/refresh")
+    @ApiOperation(value = "刷新购物车的数据", notes = "刷新购物车的数据", httpMethod = "GET")
+    public JSONResult refresh(@ApiParam(name = "itemSpecIds", value = "拼接的规格ids", required = true)
+                                  @RequestParam("itemSpecIds") String itemSpecIds) {
+        if (StringUtils.isBlank(itemSpecIds)) {
+            return JSONResult.ok();
+        }
+        return JSONResult.ok(itemService.queryItemsBySpecIds(itemSpecIds));
     }
 }

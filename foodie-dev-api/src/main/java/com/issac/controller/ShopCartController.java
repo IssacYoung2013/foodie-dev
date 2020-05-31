@@ -36,4 +36,17 @@ public class ShopCartController {
         // TODO 同步购物车到redis
         return JSONResult.ok();
     }
+
+    @PostMapping("/del")
+    @ApiOperation(value = "删除购物车商品", notes = "删除购物车商品", httpMethod = "POST")
+    public JSONResult del(@RequestParam String userId,
+                          @RequestParam String itemSpecId,
+                          HttpServletRequest request,
+                          HttpServletResponse response) {
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(itemSpecId)) {
+            return JSONResult.errorMsg("");
+        }
+        // TODO 同步购物车删除到redis
+        return JSONResult.ok();
+    }
 }

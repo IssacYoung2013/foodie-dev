@@ -3,23 +3,18 @@ package com.issac;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author: ywy
- * @date: 2020-05-08
+ * @date: 2020-05-30
  * @desc:
  */
 @SpringBootApplication
-// 扫描mybatis通用mapper所在的包
 @MapperScan(basePackages = "com.issac.mapper")
-@EnableTransactionManagement
-@ComponentScan(basePackages = {"com.issac","org.n3r.idworker"})
-@EnableScheduling
-public class Application {
+@ComponentScan(basePackages = {"com.issac", "org.n3r.idworker"})
+public class PayApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(PayApplication.class, args);
     }
 }
