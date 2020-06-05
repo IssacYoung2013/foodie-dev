@@ -21,7 +21,11 @@ spring:
       pool-name: DataSourceHikariCP # 连接池名字
       max-lifetime: 1800000 # 连接的生命时长，超时而没被使用则被释放
       connection-test-query: SELECT 1
-
+  servlet:
+    multipart:
+      # 文件上传大小限制
+      max-file-size: 512000
+      max-request-size: 512000
 # mybatis
 mybatis:
   type-aliases-package: com.issac.pojo # pojo包路径

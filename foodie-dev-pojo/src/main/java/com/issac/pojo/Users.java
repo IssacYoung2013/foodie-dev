@@ -1,6 +1,5 @@
 package com.issac.pojo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -9,6 +8,7 @@ public class Users {
     /**
      * 主键id 用户id
      */
+    @Id
     private String id;
 
     /**
