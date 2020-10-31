@@ -2,18 +2,17 @@ package com.issac.controller.center;
 
 import com.issac.controller.BaseController;
 import com.issac.pojo.Users;
+import com.issac.pojo.bo.ShopCartItemBO;
 import com.issac.pojo.bo.center.CenterUserBO;
 import com.issac.resource.FileUpload;
 import com.issac.service.center.CenterUserService;
-import com.issac.util.CookieUtils;
-import com.issac.util.DateUtil;
-import com.issac.util.JSONResult;
-import com.issac.util.JsonUtils;
+import com.issac.util.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +42,9 @@ public class CenterUserController extends BaseController {
 
     @Resource
     FileUpload fileUpload;
+
+    @Autowired
+    RedisOperator redisOperator;
 
     @ApiOperation(value = "用户头像修改", notes = "用户头像修改", httpMethod = "POST")
     @PostMapping("uploadFace")

@@ -1,9 +1,5 @@
 package com.issac.controller;
 
-import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
-import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.issac.enums.PayMethod;
 import com.issac.enums.PaymentStatus;
 import com.issac.pojo.Orders;
@@ -12,7 +8,6 @@ import com.issac.pojo.vo.PaymentInfoVO;
 import com.issac.resource.AliPayResource;
 import com.issac.resource.WXPayResource;
 import com.issac.service.PaymentOrderService;
-import com.issac.util.CurrencyUtils;
 import com.issac.util.JSONResult;
 import com.issac.wx.entity.PreOrderResult;
 import com.issac.wx.service.WxOrderService;
@@ -137,7 +132,7 @@ public class PaymentController {
         // 从redis中去获得这笔订单的微信支付二维码，如果订单状态没有支付没有就放入，这样的做法防止用户频繁刷新而调用微信接口
         if (waitPayOrder != null) {
 //            String qrCodeUrl = redis.get(wxPayResource.getQrcodeKey() + ":" + merchantOrderId);
-            String qrCodeUrl = "http://192.168.1.102:8088/orders/notifyMerchantOrderPaid?merchantOrderId="+merchantOrderId;
+            String qrCodeUrl = "http://api.z.mukewang.com:8088/foodie-dev-api/orders/notifyMerchantOrderPaid?merchantOrderId="+merchantOrderId;
             if (StringUtils.isEmpty(qrCodeUrl)) {
                 // 订单总金额，单位为分
                 String total_fee = String.valueOf(waitPayOrder.getAmount());
@@ -176,7 +171,7 @@ public class PaymentController {
         // 查询订单详情
         Orders waitPayOrder = paymentOrderService.queryOrderByStatus(merchantUserId, merchantOrderId, PaymentStatus.WAIT_PAY.type);
 
-        String mockAliForm = "<form name=\"punchout_form\" method=\"post\" action=\"\"http://192.168.1.102:8088/orders/notifyMerchantOrderPaid?merchantOrderId=\"+merchantOrderId\">\n" +
+        String mockAliForm = "<form name=\"punchout_form\" method=\"post\" action=\"\"http://192.168.1.106:8088/orders/notifyMerchantOrderPaid?merchantOrderId=\"+merchantOrderId\">\n" +
                 "<input type=\"hidden\" name=\"biz_content\" value=\"{    \"out_trade_no\":\""+merchantOrderId+"\",    \"product_code\":\"FAST_INSTANT_TRADE_PAY\",    \"total_amount\":0.02,    \"subject\":\" 订单：1812141933252566\",    \"extend_params\":{    \"sys_service_provider_id\":\"2018062211454921\"    }  }\">\n" +
                 "<input type=\"submit\" value=\"立即支付\" style=\"display:none\" >\n" +
                 "</form>\n" +

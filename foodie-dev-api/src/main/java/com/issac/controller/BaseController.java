@@ -20,18 +20,35 @@ public class BaseController {
 
     public static final String FOODIE_SHOPCART = "shopcart";
 
+    public static final String REDIS_USER_TOKEN = "redis_user_token";
+
     /**
      * 支付中心地址
      */
-    public static final String PAYMENT_URL = "http://localhost:8089/payment/createMerchantOrder";
+    public static final String PAYMENT_URL =
+//            "http://payment.t.mukewang.com" +
+            "http://localhost" +
+                    ":8089/" +
+//                    "foodie-payment" +
+                    "/payment/createMerchantOrder";
 
     /**
      * 支付回调
      */
-    public static final String PAY_RETURN_URL = "http://localhost:8088/orders/notifyMerchantOrderPaid";
+    public static final String PAY_RETURN_URL =
+//            "http://api.z.mukewang.com" +
+            "http://localhost" +
+                    ":8088/" +
+//                    "foodie-dev-api" +
+                    "/orders/notifyMerchantOrderPaid";
 
 
-    public static final String PAYMENT_ASYNC_RETURN_URL = "http://localhost:8089/payment/notice/mockPay";
+    public static final String PAYMENT_ASYNC_RETURN_URL =
+//            "http://payment.t.mukewang.com" +
+            "http://localhost" +
+                    ":8089/" +
+//                    "foodie-payment" +
+                    "/payment/notice/mockPay";
 
     /**
      * 用户头像地址

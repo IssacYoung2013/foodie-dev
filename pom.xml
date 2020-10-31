@@ -17,7 +17,7 @@
     </modules>
 
     <!--
-        聚合项目分为父子工程，子工程之间平级，可以相互依赖，子工程可以使用父工程。
+        聚合项目分为父子工程，子工程之间平级，可以相互依赖，子工程可以使用父工程，pom。
     -->
 
     <packaging>pom</packaging>
@@ -49,6 +49,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <!-- 打包war [2] 移除自带的内置 tomcat -->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
         </dependency>
         <!--        xml、properties 资源-->
         <dependency>
@@ -77,6 +84,11 @@
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>
             <version>1.2.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
         <!--        apache工具类-->
@@ -129,7 +141,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-
+        <!-- 打包war [3] 添加依赖 -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 </project>

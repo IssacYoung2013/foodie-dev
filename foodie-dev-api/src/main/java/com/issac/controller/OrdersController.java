@@ -6,14 +6,13 @@ import com.issac.pojo.OrderStatus;
 import com.issac.pojo.Orders;
 import com.issac.pojo.UserAddress;
 import com.issac.pojo.bo.AddressBO;
+import com.issac.pojo.bo.ShopCartItemBO;
 import com.issac.pojo.bo.SubmitOrderBO;
 import com.issac.pojo.vo.MerchantOrdersVO;
 import com.issac.pojo.vo.OrderVO;
 import com.issac.service.AddressService;
 import com.issac.service.OrderService;
-import com.issac.util.CookieUtils;
-import com.issac.util.JSONResult;
-import com.issac.util.MobileEmailUtils;
+import com.issac.util.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +44,9 @@ public class OrdersController extends BaseController {
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    RedisOperator redisOperator;
+
     @PostMapping("/create")
     @ApiOperation(value = "用户订单", notes = "用户订单", httpMethod = "POST")
     public JSONResult create(@RequestBody SubmitOrderBO submitOrderBO,
@@ -55,13 +57,21 @@ public class OrdersController extends BaseController {
                 !submitOrderBO.getPayMethod().equals(PayMethod.WEIXIN.type)) {
             return JSONResult.errorMsg("支付方式不支持");
         }
+        String shopcartJson = redisOperator.get(FOODIE_SHOPCART + ":" + submitOrderBO.getUserId());
+        if (StringUtils.isBlank(shopcartJson)) {
+            return JSONResult.errorMsg("购物车不能为空！");
+        }
 
         // 1. 创建订单
-        OrderVO orderVO = orderService.createOrder(submitOrderBO);
+        List<ShopCartItemBO> shopCartList = JsonUtils.jsonToList(shopcartJson, ShopCartItemBO.class);
+
+        OrderVO orderVO = orderService.createOrder(shopCartList, submitOrderBO);
 
         // 2. 创建订单以后，移除购物车中已结算（已提交）的商品
-        // TODO 整合 redis 完善购物车的已结算商品清除，并且同步前端的cookie
-//        CookieUtils.deleteCookie(request, response, FOODIE_SHOPCART);
+        // 清理覆盖现有redis购物车数据
+        shopCartList.removeAll(orderVO.getToBeRemovedShopcartList());
+        redisOperator.set(FOODIE_SHOPCART + ":" + submitOrderBO.getUserId(), JsonUtils.objectToJson(shopCartList));
+        CookieUtils.setCookie(request, response, FOODIE_SHOPCART,JsonUtils.objectToJson(shopCartList),true);
 
         // 3. 向支付中心发送当前订单，用于保存支付中心的订单数据
         MerchantOrdersVO merchantOrdersVO = orderVO.getMerchantOrdersVO();

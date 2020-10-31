@@ -11,6 +11,9 @@
 
     <artifactId>foodie-dev-api</artifactId>
 
+    <!-- 打包war [1]-->
+    <packaging>war</packaging>
+
     <dependencies>
         <dependency>
             <groupId>com.issac</groupId>
@@ -22,5 +25,9 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
+    <build>
+        <finalName>foodie-dev-api</finalName>
+    </build>
 </project>

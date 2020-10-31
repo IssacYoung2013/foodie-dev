@@ -11,6 +11,7 @@ import com.issac.pojo.vo.ItemCommentVO;
 import com.issac.pojo.vo.SearchItemsVO;
 import com.issac.pojo.vo.ShopCartItemVO;
 import com.issac.service.ItemService;
+import com.issac.util.DesensitizationUtil;
 import com.issac.util.PagedGridResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -114,6 +115,9 @@ public class ItemServiceImpl implements ItemService {
         // mybatis-pagehelper
         PageHelper.startPage(page, pageSize);
         List<ItemCommentVO> itemComments = itemsCustomMapper.queryItemComments(map);
+        for (ItemCommentVO vo : itemComments) {
+            vo.setNickName(DesensitizationUtil.commonDisplay(vo.getNickName()));
+        }
         return setterPagedGrid(itemComments, page);
     }
 
@@ -177,7 +181,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void decreaseItemSpecStock(String specId, Integer buyCounts) {
-        // 1. 查询库存
+        // 1. 查询库存，分布式锁
         int result = itemsCustomMapper.decreaseItemSpecStock(specId, buyCounts);
         if (result != 1) {
             throw new RuntimeException("订单创建失败，原因：库存不足");

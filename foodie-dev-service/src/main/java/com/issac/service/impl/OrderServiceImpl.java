@@ -6,6 +6,7 @@ import com.issac.mapper.OrderItemsMapper;
 import com.issac.mapper.OrderStatusMapper;
 import com.issac.mapper.OrdersMapper;
 import com.issac.pojo.*;
+import com.issac.pojo.bo.ShopCartItemBO;
 import com.issac.pojo.bo.SubmitOrderBO;
 import com.issac.pojo.vo.MerchantOrdersVO;
 import com.issac.pojo.vo.OrderVO;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,7 +53,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
+    public OrderVO createOrder(List<ShopCartItemBO> shopCartList,
+                               SubmitOrderBO submitOrderBO) {
 
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
@@ -85,10 +88,13 @@ public class OrderServiceImpl implements OrderService {
         // 商品原价
         Integer totalAmount = 0;
         Integer payAmount = 0;
+        List<ShopCartItemBO> toBeRemovedShopCartList = new ArrayList<>();
         for (String itemSpecId : itemSpecIdArr) {
+            ShopCartItemBO shopCart = getBuyCountsFromShopCart(shopCartList, itemSpecId);
             ItemsSpec itemsSpec = itemService.queryItemSpecById(itemSpecId);
             // TODO 整合redis后，商品数量从redis中获取
-            int buyCounts = 1;
+            toBeRemovedShopCartList.add(shopCart);
+            int buyCounts = shopCart.getBuyCounts();
             totalAmount += itemsSpec.getPriceNormal() * buyCounts;
             payAmount += itemsSpec.getPriceDiscount() * buyCounts;
 
@@ -134,7 +140,24 @@ public class OrderServiceImpl implements OrderService {
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
         orderVO.setMerchantOrdersVO(merchantOrdersVO);
+        orderVO.setToBeRemovedShopcartList(toBeRemovedShopCartList);
         return orderVO;
+    }
+
+    /**
+     * 从redis中获取商品
+     * @param shopCartList
+     * @param specId
+     * @return
+     */
+    private ShopCartItemBO getBuyCountsFromShopCart(List<ShopCartItemBO> shopCartList,
+                                                    String specId) {
+        for (ShopCartItemBO sc : shopCartList) {
+            if (sc.getSpecId().equals(specId)) {
+                return sc;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * @author: ywy
  * @date: 2020-05-12
- * @desc:
+ * @desc: 200 表示成功；501多个错误包装成map
  */
 public class JSONResult {
 

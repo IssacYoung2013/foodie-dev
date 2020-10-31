@@ -2,16 +2,21 @@ package com.issac.controller;
 
 import com.issac.pojo.bo.ShopCartItemBO;
 import com.issac.util.JSONResult;
+import com.issac.util.JsonUtils;
+import com.issac.util.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: ywy
@@ -21,7 +26,10 @@ import javax.servlet.http.HttpSession;
 @RestController
 @Api(value = "购物车接口", tags = "购物车接口")
 @RequestMapping("shopcart")
-public class ShopCartController {
+public class ShopCartController extends BaseController {
+
+    @Autowired
+    RedisOperator redisOperator;
 
     @PostMapping("/add")
     @ApiOperation(value = "添加商品到购物车", notes = "添加商品到购物车", httpMethod = "POST")
@@ -33,7 +41,28 @@ public class ShopCartController {
             return JSONResult.errorMsg("用户未登录");
         }
         System.out.println(shopCartBO);
-        // TODO 同步购物车到redis
+        // 判断当前购物车包含已存在的商品，累加
+        boolean isHaving = false;
+        String shopcartJson = redisOperator.get(FOODIE_SHOPCART + ":" + userId);
+        List<ShopCartItemBO> shopCartList = null;
+        if (StringUtils.isNotBlank(shopcartJson)) {
+            // redis 已经有购物车
+            shopCartList = JsonUtils.jsonToList(shopcartJson, ShopCartItemBO.class);
+            for (ShopCartItemBO sc : shopCartList) {
+                String specId = sc.getSpecId();
+                if (specId.equals(shopCartBO.getSpecId())) {
+                    sc.setBuyCounts(sc.getBuyCounts() + shopCartBO.getBuyCounts());
+                    isHaving = true;
+                }
+            }
+            if (!isHaving) {
+                shopCartList.add(shopCartBO);
+            }
+        } else {
+            shopCartList = new ArrayList<>();
+            shopCartList.add(shopCartBO);
+        }
+        redisOperator.set(FOODIE_SHOPCART + ":" + userId, JsonUtils.objectToJson(shopCartList));
         return JSONResult.ok();
     }
 
@@ -46,7 +75,20 @@ public class ShopCartController {
         if (StringUtils.isBlank(userId) || StringUtils.isBlank(itemSpecId)) {
             return JSONResult.errorMsg("");
         }
-        // TODO 同步购物车删除到redis
+        String shopcartJson = redisOperator.get(FOODIE_SHOPCART + ":" + userId);
+        if (StringUtils.isNotBlank(shopcartJson)) {
+            // redis 已经有购物车
+            List<ShopCartItemBO> shopCartList = JsonUtils.jsonToList(shopcartJson, ShopCartItemBO.class);
+            for (ShopCartItemBO sc : shopCartList) {
+                String specId = sc.getSpecId();
+                if (specId.equals(itemSpecId)) {
+                    shopCartList.remove(sc);
+                    break;
+                }
+            }
+            // 覆盖
+            redisOperator.set(FOODIE_SHOPCART + ":" + userId, JsonUtils.objectToJson(shopCartList));
+        }
         return JSONResult.ok();
     }
 }
