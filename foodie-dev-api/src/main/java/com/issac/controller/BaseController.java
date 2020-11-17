@@ -1,12 +1,17 @@
 package com.issac.controller;
 
 import com.issac.pojo.Orders;
+import com.issac.pojo.Users;
+import com.issac.pojo.vo.UsersVO;
 import com.issac.service.center.MyOrdersService;
 import com.issac.util.JSONResult;
+import com.issac.util.RedisOperator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.util.UUID;
 
 /**
  * @author: ywy
@@ -21,6 +26,9 @@ public class BaseController {
     public static final String FOODIE_SHOPCART = "shopcart";
 
     public static final String REDIS_USER_TOKEN = "redis_user_token";
+
+    @Resource
+    RedisOperator redisOperator;
 
     /**
      * 支付中心地址
@@ -66,5 +74,16 @@ public class BaseController {
             return JSONResult.errorMsg("订单不存在");
         }
         return JSONResult.ok(orders);
+    }
+
+
+    protected UsersVO convertUsersVO(Users users) {
+        // 实现用户的redis会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(REDIS_USER_TOKEN + ":" + users.getId(), uniqueToken);
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(users, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        return usersVO;
     }
 }

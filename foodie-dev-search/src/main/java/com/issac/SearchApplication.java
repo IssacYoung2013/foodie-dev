@@ -13,16 +13,8 @@ import tk.mybatis.spring.annotation.MapperScan;
  * @desc:
  */
 @SpringBootApplication
-//        (exclude = {SecurityAutoConfiguration.class})
-// 扫描mybatis通用mapper所在的包
-@MapperScan(basePackages = "com.issac.mapper")
-@EnableTransactionManagement
-@ComponentScan(basePackages = {"com.issac","org.n3r.idworker"})
-@EnableScheduling
-// 开启redis作为session
-//@EnableRedisHttpSession
-public class Application {
+public class SearchApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(SearchApplication.class, args);
     }
 }

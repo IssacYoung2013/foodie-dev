@@ -6,7 +6,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: dev
   datasource:
     # 注册数据源类型
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,8 +28,11 @@ spring:
       # 文件上传大小限制
       max-file-size: 512000
       max-request-size: 512000
-  session:
-    store-type: redis
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
 # mybatis
 mybatis:
   type-aliases-package: com.issac.pojo # pojo包路径

@@ -2,7 +2,6 @@ package com.issac.controller.center;
 
 import com.issac.controller.BaseController;
 import com.issac.pojo.Users;
-import com.issac.pojo.bo.ShopCartItemBO;
 import com.issac.pojo.bo.center.CenterUserBO;
 import com.issac.resource.FileUpload;
 import com.issac.service.center.CenterUserService;
@@ -22,7 +21,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,27 +110,28 @@ public class CenterUserController extends BaseController {
         String finalUserFaceUrl = fileUpload.getImageServerUrl() + uploadPathPrefix
                 + "?t=" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
         Users users = centerUserService.updateUserFace(userId, finalUserFaceUrl);
-        setNullProperty(users);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(users), true);
-        //todo 后续要改，增加令牌token，整合redis 分布式会话
+//        setNullProperty(users);
+        // 增加令牌token，整合redis 分布式会话
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(convertUsersVO(users)), true);
         return JSONResult.ok();
     }
 
     @ApiOperation(value = "保存用户信息", notes = "保存用户信息", httpMethod = "POST")
     @PostMapping("update")
-    public JSONResult updat(@RequestParam @ApiParam(name = "userId", value = "用户id", required = true) String userId,
-                            @RequestBody @Valid CenterUserBO centerUserBO,
-                            BindingResult result,
-                            HttpServletRequest request,
-                            HttpServletResponse response) {
+    public JSONResult update(@RequestParam @ApiParam(name = "userId", value = "用户id", required = true) String userId,
+                             @RequestBody @Valid CenterUserBO centerUserBO,
+                             BindingResult result,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
         if (result.hasErrors()) {
             Map<String, String> errorMsgs = getErrors(result);
             return JSONResult.errorMap(errorMsgs);
         }
         Users users = centerUserService.updateUserInfo(userId, centerUserBO);
-        setNullProperty(users);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(users), true);
-        //todo 后续要改，增加令牌token，整合redis 分布式会话
+//        setNullProperty(users);
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(convertUsersVO(users)), true);
         return JSONResult.ok(users);
     }
 

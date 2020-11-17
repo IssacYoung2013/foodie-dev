@@ -1,4 +1,4 @@
-package com.issac.config;
+package com.issac.es.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +22,8 @@ public class CorsConfig {
         // 1. 添加cors配置信息
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8 033");
+
         config.addAllowedOrigin("http://shop.z.mukewang.com:8080");
         config.addAllowedOrigin("http://center.z.mukewang.com:8080");
         config.addAllowedOrigin("http://shop.z.mukewang.com");

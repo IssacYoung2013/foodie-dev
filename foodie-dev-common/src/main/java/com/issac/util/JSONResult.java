@@ -41,6 +41,10 @@ public class JSONResult {
         return new JSONResult(500, msg, null);
     }
 
+    public static JSONResult errorUserTicket(String msg) {
+        return new JSONResult(557, msg, null);
+    }
+
     public static JSONResult errorMap(Object data) {
         return new JSONResult(501, "error", data);
     }
