@@ -1,0 +1,32 @@
+server:
+  port: 8001
+
+spring:
+  datasource:
+    # 注册数据源类型
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.106:3306/foodie-shop-dev?useUnicode=true&&characterEncoding=utf8
+    password: root
+    username: root
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-timeout: 30000 # 等待连接池分配连接超时时长
+      minimum-idle: 5 # 最小连接数
+      maximum-pool-size: 20 # 最大连接数
+      auto-commit: true # 自动提交
+      idle-timeout: 600000 # 连接超时的最大时长，超时则被释放
+      pool-name: DataSourceHikariCP # 连接池名字
+      max-lifetime: 1800000 # 连接的生命时长，超时而没被使用则被释放
+      connection-test-query: SELECT 1
+  rabbitmq:
+    addresses: localhost:5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 15000
+    # 是否启用消息确认模式
+    publisher-confirms: true
+    # return消息模式一起同mandatory一起使用
+    publisher-returns: true
+    template:
+      mandatory: true

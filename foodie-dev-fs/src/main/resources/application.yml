@@ -1,0 +1,37 @@
+
+spring:
+  datasource:
+    # 注册数据源类型
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.1.106:3306/foodie-shop-dev?useUnicode=true&&characterEncoding=utf8
+    password: root
+    username: root
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-timeout: 30000 # 等待连接池分配连接超时时长
+      minimum-idle: 5 # 最小连接数
+      maximum-pool-size: 20 # 最大连接数
+      auto-commit: true # 自动提交
+      idle-timeout: 600000 # 连接超时的最大时长，超时则被释放
+      pool-name: DataSourceHikariCP # 连接池名字
+      max-lifetime: 1800000 # 连接的生命时长，超时而没被使用则被释放
+      connection-test-query: SELECT 1
+  redis:
+    # redis 单机单实例
+    #    database: 1
+    #    host: 192.168.1.106
+    #    port: 6379
+    #    password: issac
+    # 哨兵模式
+    database: 1
+    password: issac
+    sentinel:
+      master: issac-master
+      nodes: 192.168.1.106:26379,192.168.1.107:26379,192.168.1.108:26379
+server:
+  port: 8066
+
+fdfs:
+  connect-timeout: 30
+  so-timeout: 30
+  tracker-list: 192.168.1.106:22122

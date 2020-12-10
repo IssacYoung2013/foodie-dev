@@ -16,6 +16,9 @@
         <module>foodie-dev-payment</module>
         <module>foodie-sso</module>
         <module>foodie-dev-search</module>
+        <module>foodie-dev-fs</module>
+        <module>foodie-dev-mq</module>
+        <module>foodie-dev-mq-consumer</module>
     </modules>
 
     <!--
