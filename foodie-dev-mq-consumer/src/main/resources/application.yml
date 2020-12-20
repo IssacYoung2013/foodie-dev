@@ -24,7 +24,6 @@ spring:
     password: guest
     virtual-host: /
     connection-timeout: 15000
-
     listener:
       simple:
         # 表示消费者成功消费消息需要手工签收
@@ -38,3 +37,18 @@ spring:
           durable: true
           type: topic
           key: springboot.*
+  kafka:
+    bootstrap-servers: 192.168.1.104:9092
+    consumer:
+      # 关闭自动签收
+      enable-auto-commit: false
+      # 消费进度
+      # latest 消费这从最新记录开始读取数据
+      # earliest 从起始位置
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      # 手工签收
+      ack-mode: manual
+      concurrency: 5

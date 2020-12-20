@@ -19,6 +19,10 @@
         <module>foodie-dev-fs</module>
         <module>foodie-dev-mq</module>
         <module>foodie-dev-mq-consumer</module>
+        <module>foodie-collector</module>
+        <module>distribute-demo</module>
+        <module>distribute-lock</module>
+        <module>distribute-zk</module>
     </modules>
 
     <!--

@@ -30,3 +30,19 @@ spring:
     publisher-returns: true
     template:
       mandatory: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    # 重试次数
+    producer:
+      retries: 0
+      batch-size: 16384
+      # 生产者缓存区大小 32m
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 生产端最重要的选项
+      # ack
+      # 0 写入消息之前不会等待任何来自服务器的响应
+      # 1 集群leader 收到消息，生产者就会收到一个来自服务器的响应
+      # -1 leader必须等待消息被成功写入到所有ISR副本中才任务producer请求成功
+      acks: 1

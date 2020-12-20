@@ -1,5 +1,6 @@
 package com.issac.mq.test;
 
+import com.issac.mq.producer.component.KafkaProducerService;
 import com.issac.mq.producer.component.RabbitSender;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,9 @@ public class MqApplicationTest {
     @Autowired
     private RabbitSender rabbitSender;
 
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
     @Test
     public void testSender() throws Exception {
         Map<String, Object> properties = new HashMap<>();
@@ -31,5 +35,16 @@ public class MqApplicationTest {
         rabbitSender.send("hello rabbitmq", properties);
 
         Thread.sleep(10000);
+    }
+
+
+    @Test
+    public void send() throws InterruptedException {
+        String topic = "topic02";
+        for (int i = 0; i < 1000; i++) {
+            kafkaProducerService.sendMessage(topic,"hello kafka "+ i);
+            Thread.sleep(5);
+        }
+        Thread.sleep(Integer.MAX_VALUE);
     }
 }
