@@ -80,9 +80,12 @@ public class OrderServiceImpl implements OrderService {
         newOrder.setLeftMsg(leftMsg);
         newOrder.setIsComment(YesOrNo.NO.type);
         newOrder.setIsDelete(YesOrNo.NO.type);
-
+        newOrder.setTotalAmount(0);
+        newOrder.setRealPayAmount(0);
         newOrder.setCreatedTime(new Date());
         newOrder.setUpdatedTime(new Date());
+        ordersMapper.insert(newOrder);
+
         // 2. 循环根据itemSpecIds保存订单商品信息表
         String[] itemSpecIdArr = itemSpecIds.split(",");
         // 商品原价
@@ -121,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
         }
         newOrder.setTotalAmount(totalAmount);
         newOrder.setRealPayAmount(payAmount);
-        ordersMapper.insert(newOrder);
+        newOrder.setUserId(null);
+        ordersMapper.updateByPrimaryKeySelective(newOrder);
 
         // 3. 保存订单状态表
         OrderStatus orderStatus = new OrderStatus();

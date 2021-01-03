@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:sharding="http://shardingsphere.apache.org/schema/shardingsphere/sharding"
+       xmlns:bean="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://shardingsphere.apache.org/schema/shardingsphere/sharding
+                        http://shardingsphere.apache.org/schema/shardingsphere/sharding/sharding.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+    <bean id="ds0" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+        <property name="jdbcUrl" value="jdbc:mysql://192.168.1.106:3306/sharding_order?useSSL=false"/>
+
+    </bean>
+
+    <bean id="ds1" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+        <property name="jdbcUrl" value="jdbc:mysql://192.168.1.107:3306/shard_order?useSSL=false"/>
+
+    </bean>
+
+    <sharding:data-source id="sharding-data-source">
+        <sharding:sharding-rule data-source-names="ds0,ds1">
+            <sharding:table-rules>
+                <sharding:table-rule logic-table="t_order" actual-data-nodes="ds$->{0..1}.t_order_$->{1..2}"
+                                     database-strategy-ref="databaseStrategy" table-strategy-ref="standard"
+                                     key-generator-ref="snowflake"/>
+                <sharding:table-rule logic-table="t_order_item" actual-data-nodes="ds$->{0..1}.t_order_item_$->{1..2}"
+                                     database-strategy-ref="databaseStrategy" table-strategy-ref="standard"/>
+            </sharding:table-rules>
+            <sharding:binding-table-rules>
+                <sharding:binding-table-rule logic-tables="t_order,t_order_item"/>
+            </sharding:binding-table-rules>
+        </sharding:sharding-rule>
+    </sharding:data-source>
+
+    <sharding:tx-type-annotation-driven></sharding:tx-type-annotation-driven>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="sharding-data-source"/>
+    </bean>
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="sharding-data-source"/>
+    </bean>
+    <sharding:inline-strategy id="databaseStrategy" sharding-column="user_id" algorithm-expression="ds$->{user_id %2}"/>
+    <sharding:inline-strategy id="tableStrategy" sharding-column="order_id"
+                              algorithm-expression="t_order_$->{order_id %2 + 1}"/>
+    <sharding:inline-strategy id="tableStrategyItem" sharding-column="order_id"
+                              algorithm-expression="t_order_item_$->{order_id %2 + 1}"/>
+    <sharding:key-generator id="uuid" column="order_id" type="UUID"/>
+    <sharding:key-generator id="snowflake" column="order_id" type="SNOWFLAKE" props-ref="snow"/>
+    <bean:properties id="snow">
+        <prop key="worker.id">678</prop>
+        <prop key="max.tolerate.time.difference.milliseconds">10</prop>
+    </bean:properties>
+    <bean id="mySharding" class="com.issac.shardingjdbc.demo.sharding.MySharding"/>
+    <sharding:standard-strategy id="standard" sharding-column="order_id" precise-algorithm-ref="mySharding"/>
+
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="sharding-data-source"/>
+        <property name="mapperLocations" value="classpath*:mapping/*.xml"/>
+    </bean>
+</beans>

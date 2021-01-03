@@ -23,6 +23,11 @@
         <module>distribute-demo</module>
         <module>distribute-lock</module>
         <module>distribute-zk</module>
+        <module>shardingjdbc-demo</module>
+        <module>xa-demo</module>
+        <module>designpattern-demo</module>
+        <module>mycat-demo</module>
+        <module>tcc-demo</module>
     </modules>
 
     <!--
@@ -166,6 +171,12 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.14.0</version>
         </dependency>
     </dependencies>
 
