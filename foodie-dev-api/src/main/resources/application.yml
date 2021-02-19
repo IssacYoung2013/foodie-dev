@@ -6,7 +6,7 @@ server:
 
 spring:
   profiles:
-    active: prod
+    active: dev
   datasource:
     # 注册数据源类型
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -30,6 +30,19 @@ spring:
       max-request-size: 512000
   session:
     store-type: redis
+  boot:
+    admin:
+      client:
+        url: http://localhost:8988
+        instance:
+          # 注册到 amdin server 的微服务名称
+          name: foodie-dev
+  application:
+    name: foodie-dev
+  task:
+    execution:
+      pool:
+        queue-capacity: 200
 # mybatis
 mybatis:
   type-aliases-package: com.issac.pojo # pojo包路径
@@ -47,3 +60,20 @@ mapper:
 pagehelper:
   helperDialect: mysql
   supportMethodsArguments: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+info:
+  project-name: foodie-dev
+  author: issac
+  owner-email: xxx
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:20000/eureka

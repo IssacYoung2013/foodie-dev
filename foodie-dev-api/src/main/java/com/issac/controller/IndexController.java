@@ -90,6 +90,13 @@ public class IndexController {
         return JSONResult.ok(cats);
     }
 
+    @GetMapping("/catsWithoutCache")
+    @ApiOperation(value = "获取一级分类", notes = "获取一级分类", httpMethod = "GET")
+    public JSONResult catsWithoutCache() {
+        List<Category> cats = categoryService.queryAllRootLevelCat();
+        return JSONResult.ok(cats);
+    }
+
     @GetMapping("/subCat/{rootCatId}")
     @ApiOperation(value = "获取一级分类子分类", notes = "获取一级分类子分类", httpMethod = "GET")
     @ApiParam(name = "rootCatId", value = "一级分类id", required = true)
